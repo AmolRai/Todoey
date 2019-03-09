@@ -10,7 +10,7 @@ import UIKit
 
 class TableViewController: UITableViewController {
 
-    let array = ["MarkFacebook", "Larry Page", "Google"]
+    var array = ["", "", ""]
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -41,8 +41,24 @@ class TableViewController: UITableViewController {
         
     }
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 100
+    
+    // TODO:- Added the bar button to add some item into todoey list
+    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var dataField = UITextField()
+        
+        let alert = UIAlertController(title: "Add", message: "", preferredStyle: .alert)
+        alert.addAction(.init(title: "Add Item", style: .default) { (action) in
+            self.array.append(dataField.text!)
+            self.tableView.reloadData()
+            
+        })
+        present(alert, animated: true, completion: nil)
+        
+        alert.addTextField { (uiTextField) in
+        uiTextField.placeholder = "Write Your List"
+            dataField = uiTextField
+        }
     }
-
+    
 }
