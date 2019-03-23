@@ -7,32 +7,25 @@
 //
 
 import UIKit
+import CoreData
 
 class TableViewController: UITableViewController {
 
     var itemArray = [Item]()
     
-    let defaults = UserDefaults.standard
+    let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem = Item()
-        newItem.title = "Amit"
-        itemArray.append(newItem)
         
-        let newItem1 = Item()
-        newItem1.title = "Amol"
-        itemArray.append(newItem1)
+        loadData()
+//
+//        if let items = UserDefaults.standard.array(forKey: "TodoList") as? [Item] {
+//            itemArray = items
+//        }
         
-        let newItem3 = Item()
-        newItem3.title = "Nishant"
-        itemArray.append(newItem3)
-        
-        if let items = UserDefaults.standard.array(forKey: "TodoList") as? [Item] {
-            itemArray = items
-        }
-       
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -51,6 +44,7 @@ class TableViewController: UITableViewController {
         // value = condition ? valueIfTrue : valueIfFalse
         
         cell?.accessoryType = item.done ? .checkmark : .none
+    
         
         return cell!
     }
@@ -59,6 +53,8 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        savingData()
         
         tableView.reloadData()
       
@@ -80,9 +76,7 @@ class TableViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
-          self.defaults.setValue(self.itemArray, forKey: "TodoList")
-            
-            self.tableView.reloadData()
+            self.savingData()
             
         }
         
@@ -96,6 +90,38 @@ class TableViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
         
         }
+    
+    // TODO: Creating a new plist file to saving the data
+    
+    func savingData() {
+        
+        let data = PropertyListEncoder()
+        do {
+       let persitentData = try data.encode(itemArray)
+          try persitentData.write(to: filePath!)
+        }
+        catch {
+            print("Error while persisting the data\(error)")
+        }
+        tableView.reloadData()
     }
+    
+    func loadData() {
+        
+        if let data = try? Data(contentsOf: filePath!) {
+             let decoder = PropertyListDecoder()
+        
+        do {
+            itemArray = try decoder.decode([Item].self, from: data)
+        }
+        catch {
+            print("erroe while loading data\(error)")
+        }
+        
+    }
+        
+    }
+    
+}
     
 
